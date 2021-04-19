@@ -20,14 +20,21 @@ public class VillagerAI : MonoBehaviour {
     /// Generic Stats
     /// </summary>
     [HideInInspector]
+    public float health = 100.0f;
+    [HideInInspector]
     public float hunger = 0.0f;
     [HideInInspector]
     public float speed = 1.0f;
 
+    /// <summary>
+    /// others
+    /// </summary>
     [HideInInspector]
     public TreeAI target;
     [HideInInspector]
     public bool work = false;
+    [HideInInspector]
+    public InventorySystem resource;
     
 
     public StateMachine<VillagerAI> stateMachine { get; set; }
@@ -50,15 +57,20 @@ public class VillagerAI : MonoBehaviour {
     }
 
     void Die() {
-        stateMachine.ChangeState(DeathState.Instance);
+        if (health <= 0.0f)
+            stateMachine.ChangeState(DeathState.Instance);
     }
 
-    void genericStatsCalc()
-    {
+    void genericStatsCalc() {
         hunger += gameTimer;
-        if (hunger >= 500.0f)
-        {
+        if (hunger >= 150.0f)
+            stateMachine.ChangeState(HuntState.Instance);
+        else
+            if (resource.lumberJack)
+            stateMachine.ChangeState(WorkState.Instance);
+        if (hunger >= 500.0f) {
             hunger = 500.0f;
+            health -= 0.5f;
         }
     }
     
